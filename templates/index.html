@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Welcome to the Car Maintenance Tracker</h1>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px;">
+    <a href="/users" style="text-decoration: none;">
+        <div class="card" style="text-align: center; cursor: pointer; transition: transform 0.2s;"
+             onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 48px;">👤</div>
+            <h2 style="margin-top: 12px;">Users</h2>
+            <p style="color: #666; font-size: 14px; margin-top: 8px;">Manage user accounts and profiles</p>
+        </div>
+    </a>
+    <a href="/vehicles" style="text-decoration: none;">
+        <div class="card" style="text-align: center; cursor: pointer; transition: transform 0.2s;"
+             onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 48px;">🚗</div>
+            <h2 style="margin-top: 12px;">Vehicles</h2>
+            <p style="color: #666; font-size: 14px; margin-top: 8px;">Track vehicles and ownership</p>
+        </div>
+    </a>
+    <a href="/records" style="text-decoration: none;">
+        <div class="card" style="text-align: center; cursor: pointer; transition: transform 0.2s;"
+             onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 48px;">🔧</div>
+            <h2 style="margin-top: 12px;">Maintenance Records</h2>
+            <p style="color: #666; font-size: 14px; margin-top: 8px;">Log and manage service history</p>
+        </div>
+    </a>
+    <a href="/types" style="text-decoration: none;">
+        <div class="card" style="text-align: center; cursor: pointer; transition: transform 0.2s;"
+             onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 48px;">📋</div>
+            <h2 style="margin-top: 12px;">Maintenance Types</h2>
+            <p style="color: #666; font-size: 14px; margin-top: 8px;">Define service categories and intervals</p>
+        </div>
+    </a>
+</div>
+
+{% endblock %}

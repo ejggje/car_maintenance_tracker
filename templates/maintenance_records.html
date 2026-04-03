@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Maintenance Records</h1>
+
+<!-- ADD / EDIT FORM -->
+<div class="card">
+    {% if edit_record %}
+        <h2>Edit Maintenance Record</h2>
+        <form action="/records/update/{{ edit_record.maintenance_record_id }}" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Vehicle</label>
+                    <select name="vehicle_id">
+                        {% for vehicle in vehicles %}
+                        <option value="{{ vehicle.vehicle_id }}"
+                            {% if vehicle.vehicle_id == edit_record.vehicle_id %}selected{% endif %}>
+                            {{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Maintenance Type</label>
+                    <select name="maintenance_type_id">
+                        {% for type in types %}
+                        <option value="{{ type.maintenance_type_id }}"
+                            {% if type.maintenance_type_id == edit_record.maintenance_type_id %}selected{% endif %}>
+                            {{ type.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Facility (optional)</label>
+                    <select name="facility_id">
+                        <option value="">-- Self Performed --</option>
+                        {% for facility in facilities %}
+                        <option value="{{ facility.facility_id }}"
+                            {% if facility.facility_id == edit_record.facility_id %}selected{% endif %}>
+                            {{ facility.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Service Date</label>
+                    <input type="date" name="service_date"
+                           value="{{ edit_record.service_date }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mileage at Service</label>
+                    <input type="number" name="mileage_at_service"
+                           value="{{ edit_record.mileage_at_service }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Cost (optional)</label>
+                    <input type="number" step="0.01" name="cost"
+                           value="{{ edit_record.cost }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea name="notes" rows="2">{{ edit_record.notes }}</textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/records" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    {% else %}
+        <h2>Add New Maintenance Record</h2>
+        <form action="/records/add" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Vehicle</label>
+                    <select name="vehicle_id">
+                        {% for vehicle in vehicles %}
+                        <option value="{{ vehicle.vehicle_id }}">
+                            {{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Maintenance Type</label>
+                    <select name="maintenance_type_id">
+                        {% for type in types %}
+                        <option value="{{ type.maintenance_type_id }}">
+                            {{ type.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Facility (optional)</label>
+                    <select name="facility_id">
+                        <option value="">-- Self Performed --</option>
+                        {% for facility in facilities %}
+                        <option value="{{ facility.facility_id }}">
+                            {{ facility.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Service Date</label>
+                    <input type="date" name="service_date" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mileage at Service</label>
+                    <input type="number" name="mileage_at_service"
+                           placeholder="34000" required>
+                </div>
+                <div class="form-group">
+                    <label>Cost (optional)</label>
+                    <input type="number" step="0.01" name="cost"
+                           placeholder="49.99">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea name="notes" rows="2"
+                          placeholder="Any additional notes..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Record</button>
+        </form>
+    {% endif %}
+</div>
+
+<!-- RECORDS TABLE -->
+{% if records %}
+<div class="card">
+    <h2>All Maintenance Records</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vehicle</th>
+                <th>Service Type</th>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Mileage</th>
+                <th>Cost</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.maintenance_record_id }}</td>
+                <td>{{ record.make }} {{ record.model }}</td>
+                <td>{{ record.type_name }}</td>
+                <td>{{ record.facility_name or 'Self Performed' }}</td>
+                <td>{{ record.service_date }}</td>
+                <td>{{ "{:,}".format(record.mileage_at_service) }} mi</td>
+                <td>{% if record.cost %}${{ "%.2f"|format(record.cost) }}{% else %}—{% endif %}</td>
+                <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {{ record.notes or '—' }}
+                </td>
+                <td class="actions">
+                    <a href="/records/edit/{{ record.maintenance_record_id }}"
+                       class="btn btn-edit">Edit</a>
+                    <a href="/records/delete/{{ record.maintenance_record_id }}"
+                       class="btn btn-delete"
+                       onclick="return confirm('Delete this record?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

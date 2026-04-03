@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Vehicles</h1>
+
+<!-- ADD / EDIT FORM -->
+<div class="card">
+    {% if edit_vehicle %}
+        <h2>Edit Vehicle</h2>
+        <form action="/vehicles/update/{{ edit_vehicle.vehicle_id }}" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Owner</label>
+                    <select name="user_id">
+                        {% for user in users %}
+                        <option value="{{ user.user_id }}"
+                            {% if user.user_id == edit_vehicle.user_id %}selected{% endif %}>
+                            {{ user.first_name }} {{ user.last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Make</label>
+                    <input type="text" name="make" value="{{ edit_vehicle.make }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Model</label>
+                    <input type="text" name="model" value="{{ edit_vehicle.model }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="number" name="year" value="{{ edit_vehicle.year }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Current Mileage</label>
+                    <input type="number" name="current_mileage" value="{{ edit_vehicle.current_mileage }}" required>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/vehicles" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    {% else %}
+        <h2>Add New Vehicle</h2>
+        <form action="/vehicles/add" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Owner</label>
+                    <select name="user_id">
+                        {% for user in users %}
+                        <option value="{{ user.user_id }}">
+                            {{ user.first_name }} {{ user.last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>VIN</label>
+                    <input type="text" name="vin" placeholder="1HGBH41JXMN109186" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Make</label>
+                    <input type="text" name="make" placeholder="Honda" required>
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <input type="text" name="model" placeholder="Civic" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="number" name="year" placeholder="2021" required>
+                </div>
+                <div class="form-group">
+                    <label>Current Mileage</label>
+                    <input type="number" name="current_mileage" placeholder="34000" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Vehicle</button>
+        </form>
+    {% endif %}
+</div>
+
+<!-- VEHICLES TABLE -->
+{% if vehicles %}
+<div class="card">
+    <h2>All Vehicles</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Owner</th>
+                <th>VIN</th>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Mileage</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vehicle in vehicles %}
+            <tr>
+                <td>{{ vehicle.vehicle_id }}</td>
+                <td>{{ vehicle.first_name }} {{ vehicle.last_name }}</td>
+                <td style="font-family: monospace; font-size: 12px;">{{ vehicle.vin }}</td>
+                <td>{{ vehicle.make }}</td>
+                <td>{{ vehicle.model }}</td>
+                <td>{{ vehicle.year }}</td>
+                <td>{{ "{:,}".format(vehicle.current_mileage) }} mi</td>
+                <td class="actions">
+                    <a href="/vehicles/edit/{{ vehicle.vehicle_id }}" class="btn btn-edit">Edit</a>
+                    <a href="/vehicles/delete/{{ vehicle.vehicle_id }}" class="btn btn-delete"
+                       onclick="return confirm('Delete this vehicle?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

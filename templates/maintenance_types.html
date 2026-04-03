@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Maintenance Types</h1>
+
+<!-- ADD / EDIT FORM -->
+<div class="card">
+    {% if edit_type %}
+        <h2>Edit Maintenance Type</h2>
+        <form action="/types/update/{{ edit_type.maintenance_type_id }}" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ edit_type.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" value="{{ edit_type.description }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Default Interval (Miles)</label>
+                    <input type="number" name="default_interval_miles"
+                           value="{{ edit_type.default_interval_miles }}">
+                </div>
+                <div class="form-group">
+                    <label>Default Interval (Days)</label>
+                    <input type="number" name="default_interval_days"
+                           value="{{ edit_type.default_interval_days }}">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/types" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    {% else %}
+        <h2>Add New Maintenance Type</h2>
+        <form action="/types/add" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" placeholder="Oil Change" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="description"
+                           placeholder="Replace engine oil and filter">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Default Interval (Miles)</label>
+                    <input type="number" name="default_interval_miles" placeholder="5000">
+                </div>
+                <div class="form-group">
+                    <label>Default Interval (Days)</label>
+                    <input type="number" name="default_interval_days" placeholder="180">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Maintenance Type</button>
+        </form>
+    {% endif %}
+</div>
+
+<!-- TYPES TABLE -->
+{% if types %}
+<div class="card">
+    <h2>All Maintenance Types</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Interval (Miles)</th>
+                <th>Interval (Days)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type in types %}
+            <tr>
+                <td>{{ type.maintenance_type_id }}</td>
+                <td>{{ type.name }}</td>
+                <td>{{ type.description or '—' }}</td>
+                <td>{% if type.default_interval_miles %}
+                    {{ "{:,}".format(type.default_interval_miles) }} mi
+                    {% else %}—{% endif %}
+                </td>
+                <td>{% if type.default_interval_days %}
+                    {{ type.default_interval_days }} days
+                    {% else %}—{% endif %}
+                </td>
+                <td class="actions">
+                    <a href="/types/edit/{{ type.maintenance_type_id }}"
+                       class="btn btn-edit">Edit</a>
+                    <a href="/types/delete/{{ type.maintenance_type_id }}"
+                       class="btn btn-delete"
+                       onclick="return confirm('Delete this type?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

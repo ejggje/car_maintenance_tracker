@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Users</h1>
+
+<!-- ADD / EDIT FORM -->
+<div class="card">
+    {% if edit_user %}
+        <h2>Edit User</h2>
+        <form action="/users/update/{{ edit_user.user_id }}" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" value="{{ edit_user.first_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" value="{{ edit_user.last_name }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ edit_user.email }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role">
+                        <option value="owner" {% if edit_user.role == 'owner' %}selected{% endif %}>Owner</option>
+                        <option value="servicer" {% if edit_user.role == 'servicer' %}selected{% endif %}>Servicer</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/users" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    {% else %}
+        <h2>Add New User</h2>
+        <form action="/users/add" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" placeholder="Doe" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="john@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role">
+                        <option value="owner">Owner</option>
+                        <option value="servicer">Servicer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password_hash" placeholder="Enter password" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add User</button>
+        </form>
+    {% endif %}
+</div>
+
+<!-- USERS TABLE -->
+{% if users %}
+<div class="card">
+    <h2>All Users</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.user_id }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <span class="badge badge-{{ user.role }}">{{ user.role }}</span>
+                </td>
+                <td>
+                    {% if user.is_active %}
+                        <span class="badge badge-active">Active</span>
+                    {% else %}
+                        Inactive
+                    {% endif %}
+                </td>
+                <td class="actions">
+                    <a href="/users/edit/{{ user.user_id }}" class="btn btn-edit">Edit</a>
+                    <a href="/users/delete/{{ user.user_id }}" class="btn btn-delete"
+                       onclick="return confirm('Delete this user?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}
