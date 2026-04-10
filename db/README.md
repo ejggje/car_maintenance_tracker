@@ -1,0 +1,1 @@
+This is a placeholder file to set up the future project structure.
