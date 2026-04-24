@@ -18,6 +18,13 @@
         }
         nav a:hover { background: #16213e; }
         nav .brand { font-size: 20px; font-weight: bold; color: #e94560; margin-right: auto; }
+        nav .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+        nav .user-label { color: #aaa; font-size: 13px; }
+        nav .btn-logout {
+            background: #e94560; color: white; padding: 6px 14px;
+            border-radius: 6px; font-size: 13px; text-decoration: none;
+        }
+        nav .btn-logout:hover { background: #c73652; }
         .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
         h1 { margin-bottom: 24px; color: #1a1a2e; font-size: 28px; }
         h2 { margin-bottom: 16px; color: #1a1a2e; font-size: 20px; }
@@ -57,17 +64,34 @@
         }
         .badge-owner { background: #d4edda; color: #155724; }
         .badge-servicer { background: #cce5ff; color: #004085; }
+        .badge-admin { background: #f8d7da; color: #721c24; }
         .badge-active { background: #d4edda; color: #155724; }
     </style>
 </head>
 <body>
     <nav>
         <span class="brand">🚗 Car Maintenance Tracker</span>
-        <a href="/">Home</a>
-        <a href="/users">Users</a>
-        <a href="/vehicles">Vehicles</a>
-        <a href="/records">Maintenance Records</a>
-        <a href="/types">Maintenance Types</a>
+        {% if session.get('role') == 'admin' %}
+            <a href="/">Home</a>
+            <a href="/users">Users</a>
+            <a href="/vehicles">Vehicles</a>
+            <a href="/records">Maintenance Records</a>
+            <a href="/types">Maintenance Types</a>
+            <a href="/reports">Reports</a>
+        {% elif session.get('role') == 'owner' %}
+            <a href="/owner/dashboard">My Dashboard</a>
+            <a href="/reports">Reports</a>
+        {% elif session.get('role') == 'servicer' %}
+            <a href="/servicer/dashboard">My Dashboard</a>
+            <a href="/reports">Reports</a>
+        {% endif %}
+        <div class="nav-right">
+            {% if session.get('name') %}
+                <span class="user-label">{{ session['name'] }} ({{ session['role'] }})</span>
+                <a href="/change-password" style="color:#aaa;font-size:13px;text-decoration:none;">Change Password</a>
+                <a href="/logout" class="btn-logout">Logout</a>
+            {% endif %}
+        </div>
     </nav>
     <div class="container">
         {% block content %}{% endblock %}

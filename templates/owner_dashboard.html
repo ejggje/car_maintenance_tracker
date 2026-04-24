@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Welcome, {{ session['name'] }}</h1>
+
+<!-- MY VEHICLES -->
+<div class="card">
+    <h2>My Vehicles</h2>
+    <form action="/owner/vehicles/add" method="POST" style="margin-bottom: 20px;">
+        <div class="form-row">
+            <div class="form-group">
+                <label>VIN</label>
+                <input type="text" name="vin" placeholder="1HGBH41JXMN109186" required>
+            </div>
+            <div class="form-group">
+                <label>Make</label>
+                <input type="text" name="make" placeholder="Honda" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Model</label>
+                <input type="text" name="model" placeholder="Civic" required>
+            </div>
+            <div class="form-group">
+                <label>Year</label>
+                <input type="number" name="year" placeholder="2021" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Current Mileage</label>
+                <input type="number" name="current_mileage" placeholder="34000" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Vehicle</button>
+    </form>
+
+    {% if vehicles %}
+    <table>
+        <thead>
+            <tr>
+                <th>VIN</th>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Mileage</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in vehicles %}
+            <tr>
+                <td style="font-family:monospace;font-size:12px;">{{ v.vin }}</td>
+                <td>{{ v.make }}</td>
+                <td>{{ v.model }}</td>
+                <td>{{ v.year }}</td>
+                <td>{{ "{:,}".format(v.current_mileage) }} mi</td>
+                <td>
+                    <a href="/owner/vehicles/delete/{{ v.vehicle_id }}" class="btn btn-delete"
+                       onclick="return confirm('Delete this vehicle and all its records?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#666;font-size:14px;">No vehicles yet. Add one above.</p>
+    {% endif %}
+</div>
+
+<!-- LOG A MAINTENANCE RECORD -->
+<div class="card">
+    <h2>Log Maintenance</h2>
+    <form action="/owner/records/add" method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Vehicle</label>
+                <select name="vehicle_id" required>
+                    {% for v in vehicles %}
+                    <option value="{{ v.vehicle_id }}">{{ v.year }} {{ v.make }} {{ v.model }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Maintenance Type</label>
+                <select name="maintenance_type_id" required>
+                    {% for t in types %}
+                    <option value="{{ t.maintenance_type_id }}">{{ t.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Service Facility (optional)</label>
+                <select name="facility_id">
+                    <option value="">-- Self Performed --</option>
+                    {% for f in facilities %}
+                    <option value="{{ f.facility_id }}">{{ f.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Service Date</label>
+                <input type="date" name="service_date" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mileage at Service</label>
+                <input type="number" name="mileage_at_service" placeholder="34000" required>
+            </div>
+            <div class="form-group">
+                <label>Cost (optional)</label>
+                <input type="number" step="0.01" name="cost" placeholder="49.99">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Notes (optional)</label>
+            <textarea name="notes" rows="2" placeholder="Any additional notes..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Log Record</button>
+    </form>
+</div>
+
+<!-- SERVICE HISTORY -->
+<div class="card">
+    <h2>My Service History</h2>
+    {% if records %}
+    <table>
+        <thead>
+            <tr>
+                <th>Vehicle</th>
+                <th>Service Type</th>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Mileage</th>
+                <th>Cost</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr>
+                <td>{{ r.make }} {{ r.model }}</td>
+                <td>{{ r.type_name }}</td>
+                <td>{{ r.facility_name or 'Self Performed' }}</td>
+                <td>{{ r.service_date }}</td>
+                <td>{{ "{:,}".format(r.mileage_at_service) }} mi</td>
+                <td>{% if r.cost %}${{ "%.2f"|format(r.cost) }}{% else %}—{% endif %}</td>
+                <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    {{ r.notes or '—' }}
+                </td>
+                <td>
+                    <a href="/owner/records/delete/{{ r.maintenance_record_id }}" class="btn btn-delete"
+                       onclick="return confirm('Delete this record?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#666;font-size:14px;">No maintenance records yet.</p>
+    {% endif %}
+</div>
+
+<!-- AVAILABLE SERVICE FACILITIES -->
+<div class="card">
+    <h2>Available Service Facilities</h2>
+    {% if facilities %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Website</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in facilities %}
+            <tr>
+                <td>{{ f.name }}</td>
+                <td>{{ f.address or '—' }}</td>
+                <td>{{ f.phone or '—' }}</td>
+                <td>{% if f.website %}<a href="{{ f.website }}" target="_blank">{{ f.website }}</a>{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#666;font-size:14px;">No facilities registered yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

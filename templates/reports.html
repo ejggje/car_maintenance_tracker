@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Reports</h1>
+
+<!-- REPORT 1: Total cost per vehicle -->
+<div class="card">
+    <h2>Report 1: Total Maintenance Cost per Vehicle</h2>
+    <p style="color:#555;font-size:14px;margin-bottom:16px;">
+        Shows total spending and number of services per vehicle, ordered by highest cost.
+        Helps owners decide whether to keep servicing an aging vehicle or consider replacing it.
+    </p>
+    {% if cost_report %}
+    <table>
+        <thead>
+            <tr>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Total Services</th>
+                <th>Total Spent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in cost_report %}
+            <tr>
+                <td>{{ row.make }}</td>
+                <td>{{ row.model }}</td>
+                <td>{{ row.year }}</td>
+                <td>{{ row.total_services }}</td>
+                <td>{% if row.total_spent %}${{ "%.2f"|format(row.total_spent) }}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#666;font-size:14px;">No data available.</p>
+    {% endif %}
+</div>
+
+<!-- REPORT 2: Service frequency by type -->
+<div class="card">
+    <h2>Report 2: Service Frequency by Maintenance Type</h2>
+    <p style="color:#555;font-size:14px;margin-bottom:16px;">
+        Shows how many times each service type has been performed and the average cost.
+        Helps identify the most common maintenance needs across all vehicles.
+    </p>
+    {% if frequency_report %}
+    <table>
+        <thead>
+            <tr>
+                <th>Service Type</th>
+                <th>Times Performed</th>
+                <th>Average Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in frequency_report %}
+            <tr>
+                <td>{{ row.service_type }}</td>
+                <td>{{ row.times_performed }}</td>
+                <td>{% if row.average_cost %}${{ "%.2f"|format(row.average_cost) }}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#666;font-size:14px;">No data available.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

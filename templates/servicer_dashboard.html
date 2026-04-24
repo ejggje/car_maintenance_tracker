@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Welcome, {{ session['name'] }}</h1>
+
+<!-- LOG A SERVICE RECORD -->
+<div class="card">
+    <h2>Log a Service</h2>
+    <form action="/servicer/records/add" method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Vehicle ID</label>
+                <input type="number" name="vehicle_id" placeholder="Vehicle ID" required>
+            </div>
+            <div class="form-group">
+                <label>Maintenance Type</label>
+                <select name="maintenance_type_id" required>
+                    {% for t in types %}
+                    <option value="{{ t.maintenance_type_id }}">{{ t.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Your Facility</label>
+                <select name="facility_id" required>
+                    {% for f in facilities %}
+                    <option value="{{ f.facility_id }}">{{ f.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Service Date</label>
+                <input type="date" name="service_date" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mileage at Service</label>
+                <input type="number" name="mileage_at_service" placeholder="34000" required>
+            </div>
+            <div class="form-group">
+                <label>Cost (optional)</label>
+                <input type="number" step="0.01" name="cost" placeholder="49.99">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Notes (optional)</label>
+            <textarea name="notes" rows="2" placeholder="Service notes..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Log Service</button>
+    </form>
+</div>
+
+<!-- ALL SERVICE RECORDS (facility-filtered in future; all for MVP) -->
+<div class="card">
+    <h2>Service Records</h2>
+    {% if records %}
+    <table>
+        <thead>
+            <tr>
+                <th>Vehicle</th>
+                <th>Year</th>
+                <th>Service Type</th>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Mileage</th>
+                <th>Cost</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr>
+                <td>{{ r.make }} {{ r.model }}</td>
+                <td>{{ r.year }}</td>
+                <td>{{ r.type_name }}</td>
+                <td>{{ r.facility_name }}</td>
+                <td>{{ r.service_date }}</td>
+                <td>{{ "{:,}".format(r.mileage_at_service) }} mi</td>
+                <td>{% if r.cost %}${{ "%.2f"|format(r.cost) }}{% else %}—{% endif %}</td>
+                <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    {{ r.notes or '—' }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:#666;font-size:14px;">No service records found.</p>
+    {% endif %}
+</div>
+
+<!-- FACILITIES INFO -->
+<div class="card">
+    <h2>Registered Facilities</h2>
+    {% if facilities %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Website</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in facilities %}
+            <tr>
+                <td>{{ f.name }}</td>
+                <td>{{ f.address or '—' }}</td>
+                <td>{{ f.phone or '—' }}</td>
+                <td>{% if f.website %}<a href="{{ f.website }}" target="_blank">{{ f.website }}</a>{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+{% endblock %}
